@@ -196,3 +196,113 @@ sudo service apache2 restart
 ```
 
 ## Install WordPress
+
+### 1: On the primary Linode, download and install the latest version of WordPress:
+```
+cd /var/www
+wget https://wordpress.org/latest.tar.gz
+tar -xvf latest.tar.gz
+cp -R wordpress/* /var/www/example.com/public_html
+```
+
+### 2: Configure the MySQL database for the new WordPress installation:
+```
+mysql -u root -p
+```
+```
+CREATE DATABASE wordpress;
+GRANT ALL PRIVILEGES ON wordpress.* TO 'rep1'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+EXIT
+```
+
+### 3: Set permissions on the Document Root directory to enable WordPress to complete its configuration steps:
+```
+chmod 777 /var/www/example.com/public_html/
+```
+
+### 4: Connect to your Linode’s IP address using your web browser, and walk through the configuration steps to fully install WordPress.
+Set your username and database name to rep1 and wordpress. Make sure that the Database Host value in this step is set to localhost
+
+### 5: Configure your WordPress URL and Site Address via the General Settings in the WordPress admin interface. 
+### 6: Reset permissions on your Document Root directory to ensure additional security
+```
+chmod 755 /var/www/example.com/public_html/
+```
+
+### 7: Copy the configurations to your second Linode.
+```
+rsync -r /var/www/* <Linode2-IP>:/var/www/.
+```
+Type 'yes' and the root password for Linode2 when prompted.
+
+### 8: Restart Apache on Linode2
+```
+sudo service apache2 restart
+```
+
+## Configure Folder Sync
+
+### 1: Generate a public and private key on Linode1 and copy the public key to Linode2:
+
+You will need to input the password for the root user on Linode2
+```
+ssh-keygen -t rsa
+```
+```
+ssh-copy-id root@<Linode2-IP>
+```
+
+### 2: Install Lsyncd on Linode1:
+```
+sudo apt-get install lsyncd
+```
+
+### 3: Create a configuration file in order to perform sync actions. Replace x.x.x.x with the IP address of the second Linode:
+```
+mkdir /etc/lsyncd
+vi /etc/lsyncd/lsyncd.conf.lua
+```
+```
+settings {
+logfile = "/var/log/lsyncd/lsyncd.log",
+statusFile = "/var/log/lsyncd/lsyncd-status.log"
+}
+
+sync{
+default.rsyncssh,
+delete = false,
+insist,
+source="/var/www",
+host="45.56.116.30",
+targetdir="/var/www",
+rsync = {
+archive = true,
+perms = true,
+owner = true,
+_extra = {"-a"},
+},
+delay = 5,
+maxProcesses = 1,
+ssh = {
+port = 22
+}
+
+}
+
+```
+
+### 4: Start and Test Lsyncd Daemon
+```
+systemctl stop lsyncd
+systemctl start lsyncd
+systemctl enable lsyncd
+```
+```
+systemctl status lsyncd
+```
+
+If all is set-up correctly, you should be able to create a file in /var/www/ on Linode1 and see it replicated in /var/www/ on Linode2
+
+
+
