@@ -136,3 +136,63 @@ start slave;
 ## Configure Apache
 The steps in this section will need to be performed on both of your Linodes.
 
+### 1: Install Apache
+```
+sudo apt-get install apache2
+```
+
+### 2: Disable the default Apache virtual host by entering the following command:
+```
+sudo a2dissite *default
+```
+
+### 3: Navigate to your /var/www directory:
+```
+cd /var/www
+```
+
+### 4: Create a folder to hold your website by entering the following command:
+```
+sudo mkdir example.com
+```
+
+### 5: Create a set of folders inside the folder you’ve just created to store your website’s files, logs, and backups:
+```
+sudo mkdir example.com/public_html
+sudo mkdir example.com/log
+```
+
+### 6: Create the virtual host file for the website:
+```
+vi /etc/apache2/sites-available/example.com.conf
+```
+```
+# domain: example.com
+# public: /var/www/example.com/public_html/
+
+<VirtualHost *:80>
+  # Admin email, Server Name (domain name), and any aliases
+  ServerAdmin webmaster@example.com
+  ServerName  www.example.com
+  ServerAlias example.com
+
+  # Index file and Document Root (where the public files are located)
+  DirectoryIndex index.html index.php
+  DocumentRoot /var/www/example.com/public_html
+  # Log file locations
+  LogLevel warn
+  ErrorLog  /var/www/example.com/log/error.log
+  CustomLog /var/www/example.com/log/access.log combined
+</VirtualHost>
+```
+### 7: Enable the new website by entering the following command:
+```
+sudo a2ensite example.com.conf
+```
+
+### 8: Restart apache:
+```
+sudo service apache2 restart
+```
+
+## Install WordPress
