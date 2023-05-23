@@ -133,6 +133,20 @@ reset slave;
 start slave;
 ```
 
+### 8. Avoid Collisions
+On linode 1
+```
+SET @@auto_increment_increment=2;
+```
+
+On linode 2
+```
+SET @@auto_increment_increment=2;
+SET @@auto_increment_offset=2;
+```
+
+This will ensure that both linodes won't write the same primary key on the db and cause a collision
+
 ## Configure Apache
 The steps in this section will need to be performed on both of your Linodes.
 
