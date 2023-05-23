@@ -145,6 +145,12 @@ SET @@auto_increment_increment=2;
 SET @@auto_increment_offset=2;
 ```
 
+When creating the table, make sure to add a column defined as an integer, marked as "NOT NULL", set to auto-increment and designated as the primary key:
+
+```
+CREATE TABLE <tableName>
+    -> (<columnName> INT NOT NULL AUTO_INCREMENT PRIMARY KEY);
+ ```
 This will ensure that both linodes won't write the same primary key on the db and cause a collision
 
 ## Configure Apache
