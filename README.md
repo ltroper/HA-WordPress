@@ -7,7 +7,7 @@ This guide assumes that you have a solid understanding of the Linux command line
 ## MySQL Master-Master Replication
 
 ### 1. Set up Linodes
-Set up two Linodes by following the instructions provided by Linode. Make sure you have root access to both Linodes.
+Set up two Linodes by following the instructions provided by Linode. Make sure you have root access to both Linodes and choose Ubuntu 22.04 as distribution.
 
 ### 2. Update and Install MySQL Server
 On both Linodes, update the package lists and install MySQL server using the following commands:
