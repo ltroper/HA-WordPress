@@ -133,25 +133,7 @@ reset slave;
 start slave;
 ```
 
-### 8. Avoid Collisions
-On linode 1
-```
-SET @@auto_increment_increment=2;
-```
 
-On linode 2
-```
-SET @@auto_increment_increment=2;
-SET @@auto_increment_offset=2;
-```
-
-When creating the table, make sure to add a column defined as an integer, marked as "NOT NULL", set to auto-increment and designated as the primary key:
-
-```
-CREATE TABLE <tableName>
-    -> (<columnName> INT NOT NULL AUTO_INCREMENT PRIMARY KEY);
- ```
-This will ensure that both linodes won't write the same primary key on the db and cause a collision
 
 ## Configure Apache
 The steps in this section will need to be performed on both of your Linodes.
@@ -233,8 +215,30 @@ mysql -u root -p
 CREATE DATABASE wordpress;
 GRANT ALL PRIVILEGES ON wordpress.* TO 'rep1'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
-EXIT
 ```
+
+### 2b. Avoid Collisions
+On linode 1
+```
+USE DATABASE wordpress;
+SET @@auto_increment_increment=2;
+```
+
+On linode 2
+```
+mysql -u root -p
+USE DATABASE wordpress;
+SET @@auto_increment_increment=2;
+SET @@auto_increment_offset=2;
+```
+
+When creating the table, make sure to add a column defined as an integer, marked as "NOT NULL", set to auto-increment and designated as the primary key:
+
+```
+CREATE TABLE <tableName>
+    -> (<columnName> INT NOT NULL AUTO_INCREMENT PRIMARY KEY);
+ ```
+This will ensure that both linodes won't write the same primary key on the db and cause a collision
 
 ### 3. Set permissions to enable WordPress to complete its configuration steps:
 ```
